@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Catalog App - Login</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <h1>Catalog App</h1>
+        <p>Sign in to your account</p>
+      </div>
+
+      <div class="login-form">
+        <form id="login-form">
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+          </div>
+
+          <div class="form-group">
+            <button type="submit" class="login-btn">Sign In</button>
+          </div>
+
+          <div class="error-message" id="error-message"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("login-form").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+      const errorBox = document.getElementById("error-message");
+
+      try {
+        const response = await fetch("/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          // Save token and redirect to /products
+          localStorage.setItem("access_token", data.access_token);
+          window.location.href = "/products-page";
+        } else {
+          errorBox.textContent = data.msg || "Login failed. Please check your credentials.";
+          errorBox.style.color = "red";
+        }
+      } catch (err) {
+        errorBox.textContent = "Server error. Please try again later.";
+        errorBox.style.color = "red";
+        console.error("Login error:", err);
+      }
+    });
+  </script>
+</body>
+</html>
+
